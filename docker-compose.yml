@@ -1,0 +1,34 @@
+services:
+  mariscos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: rengo-mariscos:prod
+    container_name: rengo-mariscos
+
+    restart: unless-stopped
+
+    networks:
+      - web
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+
+      # Router
+      - "traefik.http.routers.mariscos.rule=Host(`mariscos.rengo.hn`)"
+      - "traefik.http.routers.mariscos.entrypoints=websecure"
+
+      # HTTPS
+      - "traefik.http.routers.mariscos.tls=true"
+      - "traefik.http.routers.mariscos.tls.certresolver=letsencrypt"
+
+      # Service
+      - "traefik.http.routers.mariscos.service=mariscos"
+      - "traefik.http.services.mariscos.loadbalancer.server.port=80"
+
+networks:
+  web:
+    external: true
+    name: web
